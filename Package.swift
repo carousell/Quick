@@ -36,22 +36,23 @@ let package = Package(
                 dependencies: [ "Quick" ]
             ),
         ]
-#if os(macOS)
         targets.append(contentsOf: [
             .target(name: "QuickObjCRuntime", dependencies: []),
             .target(
                 name: "Quick",
-                dependencies: [ "QuickObjCRuntime" ],
+                dependencies: [ 
+                    .targetItem(
+                        name: "QuickObjCRuntime",
+                        condition: .when(
+                            platforms: [.macOS]
+                        )
+                    ) 
+                ],
                 exclude: [
                     "Info.plist",
                 ]
             ),
         ])
-#else
-        targets.append(contentsOf: [
-            .target(name: "Quick", dependencies: []),
-        ])
-#endif
         return targets
     }(),
     swiftLanguageVersions: [.v5]
