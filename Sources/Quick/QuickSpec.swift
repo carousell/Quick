@@ -57,6 +57,7 @@ open class QuickSpec: QuickSpecBase {
         return super.defaultTestSuite
     }
 
+#if canImport(QuickObjCRuntime)
     override open class func _qck_testMethodSelectors() -> [String] {
         let examples = World.sharedWorld.examples(forSpecClass: self)
 
@@ -66,6 +67,17 @@ open class QuickSpec: QuickSpecBase {
             return NSStringFromSelector(selector)
         }
     }
+#else
+    open class func _qck_testMethodSelectors() -> [String] {
+        let examples = World.sharedWorld.examples(forSpecClass: self)
+
+        var selectorNames = Set<String>()
+        return examples.map { example in
+            let selector = addInstanceMethod(for: example, classSelectorNames: &selectorNames)
+            return NSStringFromSelector(selector)
+        }
+    }
+#endif
 
     private static func addInstanceMethod(for example: Example, classSelectorNames selectorNames : inout Set<String>) -> Selector {
         let block: @convention(block) (QuickSpec) -> Void = { spec in
